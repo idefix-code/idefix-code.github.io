@@ -1,0 +1,497 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP (html5up.net | @ajlkn)
+	Adapted for the Idefix code. Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Idefix — Performance-portable astrophysical fluid dynamics</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Idefix is an exascale-ready, performance-portable finite-volume code for astrophysical (magneto-)hydrodynamics. One C++/Kokkos codebase runs on your laptop CPU and on the largest GPU supercomputers." />
+		<link rel="icon" type="image/png" href="images/Idefix-code-logo.png" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			/* Hero banner header: full-width simulation image, logo overlaid in the corner */
+			#header.alt {
+				position: relative;
+				height: clamp(430px, 60vh, 620px);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				text-align: center;
+				padding: 5.5em 5em 4em 5em;
+				background-image:
+					linear-gradient(180deg, rgba(6,18,38,.55) 0%, rgba(6,18,38,.30) 42%, rgba(6,18,38,.82) 100%),
+					url("images/fig-vsi-3d.jpg");
+				background-size: cover;
+				background-position: center 38%;
+			}
+			#header.alt h1, #header.alt p { text-shadow: 0 2px 14px rgba(0,0,0,.65); }
+
+			/* Dedalus-style dark contour panel around the banner title */
+			#header.alt .banner-inner {
+				background: rgba(6, 18, 38, 0.74);
+				border-radius: 0.3em;
+				display: inline-block;
+				padding: 1.8em 3em 2.1em;
+				box-shadow: 0 10px 34px rgba(0,0,0,.4);
+			}
+			#header.alt .banner-inner header {
+				display: inline-block;
+				border-top: solid 2px rgba(255,255,255,.85);
+				border-bottom: solid 2px rgba(255,255,255,.85);
+				margin: 0 0 1em 0;
+				padding: 2px 0;
+			}
+			#header.alt .banner-inner h1 {
+				border-top: solid 2px rgba(255,255,255,.85);
+				border-bottom: solid 2px rgba(255,255,255,.85);
+				font-weight: 900;
+				letter-spacing: 0.22em;
+				margin: 0;
+				padding-left: 0.08em;
+				text-transform: uppercase;
+			}
+			#header.alt .banner-inner p { letter-spacing: 0.05em; margin: 0; }
+			@media screen and (max-width: 736px) {
+				#header.alt .banner-inner { padding: 1.2em 1.4em 1.5em; }
+				#header.alt .banner-inner h1 { letter-spacing: 0.16em; }
+			}
+			#header.alt .logo { position: absolute; top: 1.6em; left: 2em; margin: 0; }
+			#header.alt .logo img {
+				height: 4.4em; width: auto; max-width: none;
+				background: rgba(255,255,255,.92);
+				border-radius: .7em; padding: .4em;
+				box-shadow: 0 6px 22px rgba(0,0,0,.5);
+			}
+			@media screen and (max-width: 736px) {
+				#header.alt { height: clamp(340px, 52vh, 520px); padding: 4.5em 1.5em 3em 1.5em; }
+				#header.alt .logo { top: 1em; left: 1em; }
+				#header.alt .logo img { height: 3em; }
+			}
+
+			.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 1.25em; margin: 0 0 1.5em 0; }
+			.gallery figure { margin: 0; background: #f6f9fd; border: 1px solid #e3ecf5; border-radius: 0.35em; overflow: hidden; display: flex; flex-direction: column; }
+			.gallery figure a.img { display: block; }
+			.gallery figure img { width: 100%; height: auto; display: block; }
+			.gallery figcaption { padding: 0.85em 1em; font-size: 0.88em; line-height: 1.45; color: #636363; border-top: 1px solid #e3ecf5; }
+			.gallery figcaption .src { display: block; margin-top: 0.4em; font-size: 0.86em; }
+
+			pre.cmd { background: #0b2545; color: #d7e8ff; padding: 1.1em 1.25em; border-radius: 0.35em; overflow: auto; font-size: 0.88em; line-height: 1.6; text-align: left; }
+			pre.cmd code { background: transparent; border: 0; color: inherit; padding: 0; font-size: inherit; }
+
+			.pubs { margin: 0; padding: 0; }
+			.pubs li { padding: 0.9em 0; border-bottom: 1px solid #eef2f7; }
+			.pubs li:last-child { border-bottom: 0; }
+			.pubs .title { font-weight: 600; }
+			.pubs .meta { font-size: 0.9em; color: #7a7a7a; }
+			.tag { display: inline-block; font-size: 0.7em; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #1d4e89; background: #e7f2fd; border: 1px solid #cfe6fb; border-radius: 1em; padding: 0.15em 0.6em; margin-right: 0.4em; vertical-align: middle; }
+
+			.team { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1.1em; margin: 0 0 1em 0; }
+			.member { text-align: center; padding: 1.1em 0.6em 1em; border: 1px solid #e3ecf5; border-radius: 0.4em; background: #f6f9fd; }
+			.member img { width: 92px; height: 92px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 0.65em; border: 3px solid #fff; box-shadow: 0 0 0 2px #8cc9f0; }
+			.member .name { font-weight: 600; font-size: 0.95em; line-height: 1.2; }
+			.member .role { font-size: 0.8em; color: #7a7a7a; line-height: 1.35; margin-top: 0.25em; min-height: 2.2em; }
+			.member .gh { font-size: 0.78em; display: inline-block; margin-top: 0.4em; }
+			.team-note { font-size: 0.85em; color: #7a7a7a; }
+
+			/* Footer: keep icons below the link list, not beside it */
+			#footer .icons {
+				display: block;
+				clear: both;
+				margin-top: 1.5em;
+			}
+			/* Footer's link list: no floats, block-based layout */
+			#footer section dl.alt.footer-links dt {
+				float: none;
+				clear: none;
+				width: auto;
+				display: block;
+				font-weight: 600;
+			}
+			#footer section dl.alt.footer-links dd {
+				margin: 0 0 0.6em 0;
+			}
+
+			/* Publications list left-aligned */
+			.pubs { text-align: left; }
+			.pubs li { text-align: left; }
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header: full-width banner, logo overlaid in the corner -->
+					<header id="header" class="alt">
+						<span class="logo"><img src="images/Idefix-code-logo.png" alt="Idefix logo" /></span>
+						<div class="banner-inner">
+							<header><h1>Idefix</h1></header>
+							<p>An exascale-ready, performance-portable code for astrophysical fluid dynamics.<br />
+							From your laptop's CPU to the largest GPU supercomputers &mdash; one single codebase.</p>
+						</div>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul>
+							<li><a href="#about" class="active">About</a></li>
+							<li><a href="#features">Features</a></li>
+							<li><a href="#performance">Performance</a></li>
+							<li><a href="#science">Science</a></li>
+							<li><a href="#publications">Publications</a></li>
+							<li><a href="#team">Contributors</a></li>
+							<li><a href="#get-started">Get started</a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- About -->
+							<section id="about" class="main">
+								<div class="spotlight">
+									<div class="content">
+										<header class="major">
+											<h2>What is Idefix?</h2>
+										</header>
+										<p>Idefix is a computational fluid dynamics code based on a finite-volume, high-order
+										Godunov method, originally designed for astrophysical fluid dynamics. It is
+										<strong>performance-portable</strong>: thanks to the <a href="https://github.com/kokkos/kokkos">Kokkos</a>
+										framework, a single C++20 codebase runs on your laptop's CPU <em>and</em> on the largest
+										GPU exascale clusters &mdash; in serial, with OpenMP and/or MPI, and with GPU offloading
+										(NVIDIA CUDA, AMD HIP).</p>
+										<p>It solves the compressible hydrodynamics (HD) and magnetohydrodynamics (MHD) equations in
+										1D, 2D and 3D on Cartesian, polar and spherical grids, with a wide choice of Riemann solvers
+										and reconstruction schemes.</p>
+										<ul class="actions">
+											<li><a href="https://idefix.readthedocs.io/latest/" class="button primary">Documentation</a></li>
+											<li><a href="https://github.com/idefix-code/idefix" class="button">GitHub</a></li>
+											<li><a href="https://idefix.readthedocs.io/latest/quickstart.html" class="button">Quickstart</a></li>
+										</ul>
+									</div>
+									<span class="image"><img src="images/fig-aly-gasdust.jpg" alt="Gas and dust density in a polydisperse dust-settling-instability simulation run with Idefix" /></span>
+								</div>
+							</section>
+
+						<!-- Features -->
+							<section id="features" class="main special">
+								<header class="major">
+									<h2>Features</h2>
+									<p>Physics and numerics, all embedded in one performance-portable code.</p>
+								</header>
+								<ul class="features">
+									<li>
+										<span class="icon solid major style1 fa-code"></span>
+										<h3>Godunov finite-volume</h3>
+										<p>High-order Godunov scheme for compressible HD &amp; MHD (1D/2D/3D) with constrained
+										transport, a choice of Riemann solvers (HLLE/HLLD/HLLC, Roe&hellip;) and reconstruction
+										(linear, PPM).</p>
+									</li>
+									<li>
+										<span class="icon solid major style2 fa-microchip"></span>
+										<h3>Performance portable</h3>
+										<p>One C++20 codebase for CPUs (serial, OpenMP, MPI) and GPUs (NVIDIA CUDA, AMD HIP) through
+										Kokkos &mdash; no per-architecture rewrite.</p>
+									</li>
+									<li>
+										<span class="icon solid major style3 fa-globe"></span>
+										<h3>Any geometry</h3>
+										<p>Cartesian, cylindrical/polar and spherical geometries, with variable mesh spacing.</p>
+									</li>
+									<li>
+										<span class="icon solid major style4 fa-magnet"></span>
+										<h3>Non-ideal MHD &amp; diffusion</h3>
+										<p>Ohmic, ambipolar and Hall MHD; viscosity, thermal diffusion, super-time-stepping and
+										Braginskii terms.</p>
+									</li>
+									<li>
+										<span class="icon solid major style5 fa-satellite"></span>
+										<h3>Modules</h3>
+										<p>Orbital advection (FARGO), self-gravity, dust fluids, planet&ndash;disc interaction,
+										radiative transfer (M1), grid coarsening and a Python interface (Pydefix).</p>
+									</li>
+									<li>
+										<span class="icon solid major style1 fa-check-circle"></span>
+										<h3>Validated &amp; tested</h3>
+										<p>Extensive test suite validated against analytical solutions, continuous integration, and
+										built-in profiling and debugging tools.</p>
+									</li>
+								</ul>
+								<footer class="major">
+									<ul class="actions special">
+										<li><a href="https://idefix.readthedocs.io/latest/" class="button">Read the documentation</a></li>
+									</ul>
+								</footer>
+							</section>
+
+						<!-- Performance -->
+							<section id="performance" class="main special">
+								<header class="major">
+									<h2>Exascale performance</h2>
+									<p>Benchmarked on some of the largest accelerated supercomputers in Europe.</p>
+								</header>
+								<ul class="statistics">
+									<li class="style1">
+										<span class="icon solid fa-tachometer-alt"></span>
+										<strong>10<sup>8</sup>+</strong> cell/s per NVIDIA V100 GPU (MHD)
+									</li>
+									<li class="style2">
+										<span class="icon solid fa-server"></span>
+										<strong>3&times;10<sup>11</sup></strong> cell/s on 1024 GPUs (AdAstra)
+									</li>
+									<li class="style3">
+										<span class="icon solid fa-signal"></span>
+										<strong>95%</strong> parallel efficiency over 256 nodes
+									</li>
+									<li class="style4">
+										<span class="icon solid fa-leaf"></span>
+										<strong>6&times;</strong> more energy-efficient on GPU vs CPU
+									</li>
+									<li class="style5">
+										<span class="icon solid fa-layer-group"></span>
+										<strong>4096</strong> AMD MI250X GPUs (LUMI-G)
+									</li>
+								</ul>
+								<p class="content">Idefix has been successfully tested on Intel and AMD CPUs (up to 131&#8202;072 CPU cores on
+								Irene-Rome at TGCC) as well as on NVIDIA and AMD GPUs (up to 1024 GPUs on AdAstra at CINES, and 4096 MI250X
+								on LUMI-G). It keeps excellent weak- and strong-scaling on both CPU and accelerated architectures, making it a
+								mature exascale-ready open-source code.</p>
+								<footer class="major">
+									<ul class="actions special">
+										<li><a href="https://idefix.readthedocs.io/latest/performances.html" class="button">Performance details</a></li>
+									</ul>
+								</footer>
+							</section>
+
+						<!-- Science / gallery -->
+							<section id="science" class="main">
+								<header class="major">
+									<h2>Science with Idefix</h2>
+									<p>Results obtained with the code. Figures reproduced from the open-access publications listed below.</p>
+								</header>
+								<div class="gallery">
+									<figure>
+										<a class="img" href="https://arxiv.org/abs/2508.20839"><img src="images/fig-vsi-rho.jpg" alt="Vertical shear instability in a 3D protoplanetary disc" /></a>
+										<figcaption>Vertical shear instability (VSI) turbulence in a 3D protoplanetary disc, resolved at up to 200 points per scale height.
+											<span class="src">Lesur, Latter &amp; Ogilvie 2025, A&amp;A 703, A225 &middot; <a href="https://arxiv.org/abs/2508.20839">arXiv</a></span></figcaption>
+									</figure>
+									<figure>
+										<a class="img" href="https://arxiv.org/abs/2503.01745"><img src="images/fig-wind-planet.jpg" alt="Giant planet carving a gap in a wind-launching disc" /></a>
+										<figcaption>A gap-carving giant planet in a magnetized, wind-launching disc: surface density and velocity streamlines.
+											<span class="src">Wafflard-Fernandez &amp; Lesur 2025, A&amp;A 696, A8 &middot; <a href="https://arxiv.org/abs/2503.01745">arXiv</a></span></figcaption>
+									</figure>
+									<figure>
+										<a class="img" href="https://arxiv.org/abs/2602.11818"><img src="images/fig-mnras-disc.jpg" alt="Magnetic wind launched from the inner regions of a protoplanetary disc" /></a>
+										<figcaption>Poloidal magnetic field and density in the inner regions of a protoplanetary disc threaded by a vertical net flux.
+											<span class="src">Roberts, Latter &amp; Lesur 2026, MNRAS 548, stag609 &middot; <a href="https://arxiv.org/abs/2602.11818">arXiv</a></span></figcaption>
+									</figure>
+									<figure>
+										<a class="img" href="https://arxiv.org/abs/2411.16242"><img src="images/fig-kempf-mti.jpg" alt="Magneto-thermal instability turbulence in the intracluster medium" /></a>
+										<figcaption>Magneto-thermal instability (MTI) turbulence in the stratified intracluster medium: velocity, temperature and magnetic fields.
+											<span class="src">Kempf et al. 2025, A&amp;A 694, A25 &middot; <a href="https://arxiv.org/abs/2411.16242">arXiv</a></span></figcaption>
+									</figure>
+									<figure>
+										<a class="img" href="https://arxiv.org/abs/2507.10719"><img src="images/fig-aly-dust.jpg" alt="Dust filaments in the polydisperse dust settling instability" /></a>
+										<figcaption>Dust-density filaments produced by the polydisperse dust settling instability at 1024&times;1024 resolution.
+											<span class="src">Aly &amp; Paardekooper 2025, A&amp;A 701, A105 &middot; <a href="https://arxiv.org/abs/2507.10719">arXiv</a></span></figcaption>
+									</figure>
+									<figure>
+										<a class="img" href="https://arxiv.org/abs/2606.26268"><img src="images/fig-scepi-shadow.jpg" alt="Radiation beam shadow test with the Idefix M1 radiative transfer module" /></a>
+										<figcaption>A radiation beam casting a shadow &mdash; validation of the M1 radiative-transfer module.
+											<span class="src">Scepi &amp; Lesur 2026, A&amp;A 711, A134 &middot; <a href="https://arxiv.org/abs/2606.26268">arXiv</a></span></figcaption>
+									</figure>
+								</div>
+							</section>
+
+						<!-- Publications -->
+							<section id="publications" class="main special">
+								<header class="major">
+									<h2>Publications</h2>
+									<p>If you use Idefix in your research, please cite the method paper.</p>
+								</header>
+								<ul class="pubs">
+									<li>
+										<span class="tag">Method paper</span>
+										<span class="title">Lesur, Baghdadi, Wafflard-Fernandez, Mauxion, Robert &amp; Van den Bossche 2023, &ldquo;IDEFIX: a versatile performance-portable Godunov code for astrophysical flows&rdquo;, A&amp;A 677, A9.</span>
+										<div class="meta"><a href="https://doi.org/10.1051/0004-6361/202346005">DOI</a> &middot; <a href="https://arxiv.org/abs/2304.13746">arXiv</a> &middot; <a href="https://ui.adsabs.harvard.edu/abs/2023A%26A...677A...9L/abstract">ADS</a></div>
+									</li>
+									<li>
+										<span class="tag">Planet&ndash;disc</span>
+										<span class="title">Wafflard-Fernandez &amp; Lesur 2025, &ldquo;Gone with the wind: the outward migration of eccentric giant planets in windy disks&rdquo;, A&amp;A 696, A8.</span>
+										<div class="meta"><a href="https://doi.org/10.1051/0004-6361/202453541">DOI</a> &middot; <a href="https://arxiv.org/abs/2503.01745">arXiv</a> &middot; <a href="https://ui.adsabs.harvard.edu/abs/2025A%26A...696A...8W/abstract">ADS</a></div>
+									</li>
+									<li>
+										<span class="tag">VSI</span>
+										<span class="title">Lesur, Latter &amp; Ogilvie 2025, &ldquo;High-resolution models of the vertical shear instability&rdquo;, A&amp;A 703, A225.</span>
+										<div class="meta"><a href="https://doi.org/10.1051/0004-6361/202555944">DOI</a> &middot; <a href="https://arxiv.org/abs/2508.20839">arXiv</a> &middot; <a href="https://ui.adsabs.harvard.edu/abs/2025A%26A...703A.225L/abstract">ADS</a></div>
+									</li>
+									<li>
+										<span class="tag">Inner disc</span>
+										<span class="title">Roberts, Latter &amp; Lesur 2026, &ldquo;Global magnetohydrodynamic simulations of the inner regions of protoplanetary discs. II. Vertical-net-flux regime&rdquo;, MNRAS 548, stag609.</span>
+										<div class="meta"><a href="https://doi.org/10.1093/mnras/stag609">DOI</a> &middot; <a href="https://arxiv.org/abs/2602.11818">arXiv</a> &middot; <a href="https://ui.adsabs.harvard.edu/abs/2026MNRAS.548ag609R/abstract">ADS</a></div>
+									</li>
+									<li>
+										<span class="tag">ICM turbulence</span>
+										<span class="title">Kempf et al. 2025, &ldquo;Non-linear saturation and energy transport in global simulations of magneto-thermal turbulence in the stratified intracluster medium&rdquo;, A&amp;A 694, A25.</span>
+										<div class="meta"><a href="https://doi.org/10.1051/0004-6361/202451788">DOI</a> &middot; <a href="https://arxiv.org/abs/2411.16242">arXiv</a> &middot; <a href="https://ui.adsabs.harvard.edu/abs/2025A%26A...694A..25K/abstract">ADS</a></div>
+									</li>
+									<li>
+										<span class="tag">Dust</span>
+										<span class="title">Aly &amp; Paardekooper 2025, &ldquo;Non-linear evolution of the unstratified polydisperse dust settling instability&rdquo;, A&amp;A 701, A105.</span>
+										<div class="meta"><a href="https://doi.org/10.1051/0004-6361/202554415">DOI</a> &middot; <a href="https://arxiv.org/abs/2507.10719">arXiv</a> &middot; <a href="https://ui.adsabs.harvard.edu/abs/2025A%26A...701A.105A/abstract">ADS</a></div>
+									</li>
+									<li>
+										<span class="tag">Radiative transfer</span>
+										<span class="title">Scepi &amp; Lesur 2026, &ldquo;A nonrelativistic radiative transfer module for IDEFIX&rdquo;, A&amp;A 711, A134.</span>
+										<div class="meta"><a href="https://doi.org/10.1051/0004-6361/202659210">DOI</a> &middot; <a href="https://arxiv.org/abs/2606.26268">arXiv</a> &middot; <a href="https://ui.adsabs.harvard.edu/abs/2026A%26A...711A.134S/abstract">ADS</a></div>
+									</li>
+								</ul>
+							</section>
+
+						<!-- Contributors -->
+							<section id="team" class="main">
+								<header class="major">
+									<h2>Contributors</h2>
+									<p>The main contributors to the Idefix code.</p>
+								</header>
+								<div class="team">
+									<div class="member">
+										<img src="images/team/lesur.jpg" alt="Geoffroy Lesur" />
+										<div class="name">Geoffroy Lesur</div>
+										<div class="role">Code design &amp; architecture</div>
+										<a class="gh" href="https://github.com/glesur">@glesur</a>
+									</div>
+									<div class="member">
+										<img src="images/team/baghdadi.jpg" alt="Soufiane Baghdadi" />
+										<div class="name">Soufiane Baghdadi</div>
+										<div class="role">Code optimisation, 2D Riemann solvers, RKL scheme</div>
+									</div>
+									<div class="member">
+										<img src="images/team/wafflard.jpg" alt="Gaylor Wafflard-Fernandez" />
+										<div class="name">Gaylor Wafflard-Fernandez</div>
+										<div class="role">Planet&ndash;disc interaction</div>
+									</div>
+									<div class="member">
+										<img src="images/team/mauxion.jpg" alt="Jonah Mauxion" />
+										<div class="name">Jonah Mauxion</div>
+										<div class="role">Self-gravity module</div>
+									</div>
+									<div class="member">
+										<img src="images/team/robert.jpg" alt="Clément Robert" />
+										<div class="name">Clément Robert</div>
+										<div class="role">Continuous integration, linter</div>
+										<a class="gh" href="https://github.com/neutrinoceros">@neutrinoceros</a>
+									</div>
+									<div class="member">
+										<img src="images/team/kempf.jpg" alt="Jean Kempf" />
+										<div class="name">Jean Kempf</div>
+										<div class="role">Anisotropic diffusion &amp; collisionless thermal conduction</div>
+										<a class="gh" href="https://github.com/jbkempf">@jbkempf</a>
+									</div>
+									<div class="member">
+										<img src="images/team/reville.jpg" alt="Victor Reville" />
+										<div class="name">Victor Reville</div>
+										<div class="role">Anisotropic diffusion &amp; collisionless thermal conduction</div>
+										<a class="gh" href="https://github.com/vreville">@vreville</a>
+									</div>
+									<div class="member">
+										<img src="images/team/rincon.jpg" alt="François Rincon" />
+										<div class="name">François Rincon</div>
+										<div class="role">Anisotropic diffusion &amp; collisionless thermal conduction</div>
+										<a class="gh" href="https://www.francois-rincon.org/">website</a>
+									</div>
+									<div class="member">
+										<img src="images/team/coiffier.jpg" alt="Marc Coiffier" />
+										<div class="name">Marc Coiffier</div>
+										<div class="role">Continuous integration, automatic benchmarking</div>
+										<a class="gh" href="https://github.com/lih">@lih</a>
+									</div>
+									<div class="member">
+										<img src="images/team/valat.jpg" alt="Sébastien Valat" />
+										<div class="name">Sébastien Valat</div>
+										<div class="role">Continuous integration, MPI fallback</div>
+										<a class="gh" href="https://github.com/svalat">@svalat</a>
+									</div>
+								</div>
+								<p class="team-note">Plus many more &mdash; see all <a href="https://github.com/idefix-code/idefix/graphs/contributors">GitHub contributors</a>.
+								Photos from GitHub avatars / personal pages; initials where no public photo is available.</p>
+							</section>
+
+						<!-- Get started -->
+							<section id="get-started" class="main special">
+								<header class="major">
+									<h2>Get started in minutes</h2>
+									<p>Clone, configure, compile, run &mdash; the same commands on a laptop or on a GPU cluster.</p>
+								</header>
+								<pre class="cmd"><code>git clone --recurse-submodules https://github.com/idefix-code/idefix.git idefix
+cd idefix
+export IDEFIX_DIR=$PWD
+cd test/HD/sod          # any example setup
+cmake $IDEFIX_DIR       # add -DIdefix_MPI=ON, -DKokkos_ENABLE_CUDA=ON, ... as needed
+make -j8
+./idefix                # or: mpirun -np 8 ./idefix -dec 1 2 4</code></pre>
+								<footer class="major">
+									<ul class="actions special">
+										<li><a href="https://github.com/idefix-code/idefix" class="button primary">GitHub</a></li>
+										<li><a href="https://idefix.readthedocs.io/latest/quickstart.html" class="button">Quickstart guide</a></li>
+										<li><a href="https://github.com/idefix-code/idefix/discussions" class="button">Discussions</a></li>
+									</ul>
+								</footer>
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							<h2>Idefix</h2>
+							<p>Idefix is free and open-source under the <a href="https://en.wikipedia.org/wiki/CeCILL">CeCILL</a> license.
+							If you use it in your publications, please cite the method paper (Lesur et al. 2023, A&amp;A 677, A9).
+							Development is supported by the ERC (MHDiscs, grant 815559), PEPR Origins (MHD@Exascale) and the
+							CNRS/INSU national programmes PNPS, PNST, PNHE and PNP.</p>
+							<ul class="actions">
+								<li><a href="https://github.com/idefix-code/idefix" class="button">Contribute on GitHub</a></li>
+							</ul>
+						</section>
+						<section>
+							<h2>Links</h2>
+							<dl class="alt footer-links">
+								<dt>Repository</dt>
+								<dd><a href="https://github.com/idefix-code/idefix">github.com/idefix-code/idefix</a></dd>
+								<dt>Documentation</dt>
+								<dd><a href="https://idefix.readthedocs.io/latest/">idefix.readthedocs.io</a></dd>
+								<dt>Discussions</dt>
+								<dd><a href="https://github.com/idefix-code/idefix/discussions">GitHub Discussions</a></dd>
+								<dt>Issues</dt>
+								<dd><a href="https://github.com/idefix-code/idefix/issues">GitHub Issues</a></dd>
+								<dt>Resources</dt>
+								<dd><a href="generic.html">Resources &amp; contributing</a></dd>
+							</dl>
+							<ul class="icons">
+								<li><a href="https://github.com/idefix-code/idefix" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+								<li><a href="https://idefix.readthedocs.io/latest/" class="icon solid fa-book alt"><span class="label">Documentation</span></a></li>
+								<li><a href="https://github.com/idefix-code/idefix/discussions" class="icon solid fa-comments alt"><span class="label">Discussions</span></a></li>
+								<li><a href="https://github.com/idefix-code/idefix/issues" class="icon solid fa-bug alt"><span class="label">Issues</span></a></li>
+							</ul>
+						</section>
+						<p class="copyright">&copy; 2026 The Idefix contributors. Design adapted from <a href="https://html5up.net">Stellar by HTML5 UP</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

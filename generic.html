@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP (html5up.net | @ajlkn)
+	Adapted for the Idefix code. Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Resources &amp; contributing — Idefix</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Documentation, contributing guide, requirements and license for the Idefix code." />
+		<link rel="icon" type="image/png" href="images/Idefix-code-logo.png" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			pre.cmd { background: #0b2545; color: #d7e8ff; padding: 1.1em 1.25em; border-radius: 0.35em; overflow: auto; font-size: 0.88em; line-height: 1.6; }
+			pre.cmd code { background: transparent; border: 0; color: inherit; padding: 0; font-size: inherit; }
+			.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5em; }
+			.card { border: 1px solid #e3ecf5; border-radius: 0.35em; padding: 1.25em 1.4em; background: #f6f9fd; }
+			.card h3 { margin: 0 0 0.5em 0; }
+			ul.links li { margin: 0.35em 0; }
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1><a href="index.html">Idefix</a></h1>
+						<p>Resources, requirements &amp; contributing</p>
+					</header>
+
+				<!-- Main -->
+					<div id="main">
+
+						<section id="content" class="main">
+							<h2>Documentation &amp; resources</h2>
+							<div class="grid2">
+								<div class="card">
+									<h3>Get the code</h3>
+									<pre class="cmd"><code>git clone --recurse-submodules \
+  https://github.com/idefix-code/idefix.git idefix
+cd idefix
+export IDEFIX_DIR=$PWD</code></pre>
+									<ul class="links">
+										<li><a href="https://github.com/idefix-code/idefix">Repository</a></li>
+										<li><a href="https://github.com/idefix-code/idefix/releases">Releases</a></li>
+										<li><a href="https://github.com/idefix-code/idefix/discussions">Discussions</a></li>
+									</ul>
+								</div>
+								<div class="card">
+									<h3>Documentation</h3>
+									<ul class="links">
+										<li><a href="https://idefix.readthedocs.io/latest/quickstart.html">Quickstart tutorial</a></li>
+										<li><a href="https://idefix.readthedocs.io/latest/reference.html">User guide</a></li>
+										<li><a href="https://idefix.readthedocs.io/latest/modules.html">Modules</a></li>
+										<li><a href="https://idefix.readthedocs.io/latest/programmingguide.html">Programming guide</a></li>
+										<li><a href="https://idefix.readthedocs.io/latest/performances.html">Performances</a></li>
+										<li><a href="https://idefix.readthedocs.io/latest/api/library_root.html">API (Doxygen)</a></li>
+									</ul>
+								</div>
+							</div>
+
+							<h2>Requirements</h2>
+							<p>Idefix is written in standard C++20 and needs no external library in serial (non-MPI). Kokkos is bundled as a
+							submodule and compiled on the fly. For MPI parallelisation an external (GPU-aware, on GPU architectures) MPI
+							library is required (OpenMPI, MPICH or IntelMPI). The Python interface <code>Pydefix</code> needs Python &ge; 3.10 with
+							<code>pybind11</code>. Tested compilers include GCC &ge; 11, Intel &ge; 2022 and Clang on Intel/AMD CPUs, nvcc &ge; 12
+							on NVIDIA GPUs and hipcc on AMD GPUs (Mi50&ndash;Mi300).</p>
+
+							<h2>Configure &amp; run</h2>
+							<pre class="cmd"><code>cd $IDEFIX_DIR/test/HD/sod     # pick any example
+cmake $IDEFIX_DIR                 # options: -DIdefix_MPI=ON, -DKokkos_ENABLE_OPENMP=ON,
+                                  # -DKokkos_ENABLE_CUDA=ON / HIP, -DIdefix_RECONSTRUCTION=Parabolic, ...
+make -j8
+./idefix                          # serial / OpenMP
+mpirun -np 8 ./idefix -dec 1 2 4  # MPI, e.g. 1x2x4 decomposition</code></pre>
+							<p>Useful runtime flags: <code>./idefix -profile</code> for the built-in profiler. For debugging, configure with
+							<code>-DIdefix_DEBUG=ON</code>. Most tests in <code>test/</code> can be validated against analytical or reference
+							solutions with <code>./testme.py -all</code>.</p>
+
+							<h2>Contributing</h2>
+							<p>Idefix uses the <a href="https://pre-commit.com">pre-commit</a> framework and <code>cpplint</code> (Google C++ style).
+							Install the hooks from the top-level directory, then just commit &mdash; the hooks will fix or flag style issues:
+							<pre class="cmd"><code>python3 -m pip install pre-commit
+pre-commit install</code></pre>
+							<p>Open a pull request on <a href="https://github.com/idefix-code/idefix">GitHub</a>; CI runs the full test suite.
+							See the <a href="https://idefix.readthedocs.io/latest/contributing.html">contributing guide</a> and
+							<a href="https://idefix.readthedocs.io/latest/testing.html">testing</a> pages for details.</p>
+
+							<h2>License &amp; citation</h2>
+							<p>Idefix is distributed freely under the <a href="https://en.wikipedia.org/wiki/CeCILL">CeCILL</a> license. Its data
+							structure and algorithm derive from A.&nbsp;Mignone's <a href="http://plutocode.ph.unito.it/">PLUTO</a> code (GPL), and it
+							relies on the <a href="https://github.com/kokkos/kokkos">Kokkos</a> ecosystem. If you use Idefix, please cite:
+							Lesur et al. 2023, A&amp;A 677, A9
+							(<a href="https://doi.org/10.1051/0004-6361/202346005">DOI</a>,
+							<a href="https://arxiv.org/abs/2304.13746">arXiv</a>,
+							<a href="https://ui.adsabs.harvard.edu/abs/2023A%26A...677A...9L/abstract">ADS</a>).</p>
+
+							<ul class="actions">
+								<li><a href="index.html" class="button primary">Back to home</a></li>
+								<li><a href="https://idefix.readthedocs.io/latest/" class="button">Documentation</a></li>
+							</ul>
+						</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							<h2>Idefix</h2>
+							<p>An exascale-ready, performance-portable code for astrophysical fluid dynamics.</p>
+							<ul class="actions">
+								<li><a href="index.html" class="button">Home</a></li>
+							</ul>
+						</section>
+						<section>
+							<h2>Links</h2>
+							<ul class="icons">
+								<li><a href="https://github.com/idefix-code/idefix" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+								<li><a href="https://idefix.readthedocs.io/latest/" class="icon solid fa-book alt"><span class="label">Documentation</span></a></li>
+								<li><a href="https://github.com/idefix-code/idefix/discussions" class="icon solid fa-comments alt"><span class="label">Discussions</span></a></li>
+							</ul>
+						</section>
+						<p class="copyright">&copy; 2026 The Idefix contributors. Design adapted from <a href="https://html5up.net">Stellar by HTML5 UP</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
